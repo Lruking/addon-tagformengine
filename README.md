@@ -1,2 +1,4 @@
 # convertToTagFormByBlockly
-ブロックリーを使ってタグフォームに合うように変換します
+ブロックリーを使ってアドオンのタグフォームの形に変換します
+マイクラの[Tag Form Engine]アドオンのリンクはコチラ↓↓
+https://nothing.com
