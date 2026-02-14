@@ -127,6 +127,7 @@ const BLOCK_PRIORITY = {
     button: 3,
     player: 3,
     playerCase: 4,
+    cancel: 4,
     actionCase: 5,
     dropdownCase: 5,
     multi: 6,
@@ -301,6 +302,9 @@ function buildCode(item) {
             return commands.length === 0
             ? `.cs('${item.value.elementNumber}', '${item.value.cond}')\n`
             : `.cs('${item.value.elementNumber}', '${item.value.cond}', ${result})\n`
+        }
+        case "cancel": {
+            return `.ccl('${item.value}')\n`;
         }
         default:{
             return "";
@@ -981,4 +985,14 @@ mcGenerator.forBlock['stringToCond'] = function(block) {
     const string = unwrapAndEscape(rawString);
     return [`"${string}"`, 0];
 
+};
+
+mcGenerator.forBlock['cancel'] = function(block) {
+    if (!isUnderFormCreate(block)) return "";
+    const rawContent =
+        mcGenerator.valueToCode(block, 'content', 0) || '""';
+    const content = unwrapAndEscape(rawContent);
+    // MULTI追加（isLastは書かない）
+    pushOutput(mcGenerator, "cancel", content);
+    return ""; // ←直接出力しない
 };
