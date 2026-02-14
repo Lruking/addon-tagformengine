@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://unpkg.com/blockly/blockly.min.js"></script>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    font-family: sans-serif;
+    background: #1e1e1e;
+    overflow: hidden;
+  }
+
+  #blocklyArea {
+    width: 65%;
+    height: 100%;
+  }
+
+  #blocklyDiv {
+    height: 100%;
+    width: 100%;
+  }
+
+  /* ← 追加：ドラッグバー */
+  #resizer {
+    width: 6px;
+    cursor: col-resize;
+    background: #333;
+  }
+
+  #resizer:hover {
+    background: #555;
+  }
+
+  #codeArea {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    background: #111;
+  }
+
+  #codeHeader {
+    padding: 10px;
+    background: #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 14px;
+  }
+
+  #copyBtn {
+    background: #4CAF50;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+  }
+
+  #liveOutput {
+    flex: 1;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    overflow: auto;
+    white-space: pre;
+    color: #0f0;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="blocklyArea">
+  <div id="blocklyDiv"></div>
+</div>
+
+<div id="resizer"></div>
+
+<div id="codeArea">
+  <div id="codeHeader">
+    <span>生成コード</span>
+    <button id="copyBtn">📋 コピー</button>
+  </div>
+  <div id="liveOutput"></div>
+</div>
+
+<xml id="toolbox" style="display: none">
+  <category name="総合" colour="255">
+    <block type="formCreate"></block>
+    <block type="title">
+      <value name="content">
+        <shadow type="text">
+          <field name="TEXT">こんにちは</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="divider"></block>
+    <block type="executeCommand">
+      <value name="content">
+        <shadow type="text">
+          <field name="TEXT">/say hello</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="cancel">
+      <value name="content">
+        <shadow type="text">
+          <field name="TEXT">キャンセルされました</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="header">
+      <value name="content">
+        <shadow type="text">
+          <field name="TEXT">デカ文字</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="label">
+      <value name="content">
+        <shadow type="text">
+          <field name="TEXT">ラベル付け</field>
+        </shadow>
+      </value>
+    </block>
+  </category>
+  <category name="アクションフォーム" colour="345">
+    <block type="body">
+      <value name="content">
+        <shadow type="text">
+          <field name="TEXT">フォームの説明文</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="button">
+      <value name="buttonName">
+        <shadow type="text">
+          <field name="TEXT">りんご</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="items">
+      <value name="picture">
+        <shadow type="text">
+          <field name="TEXT">apple</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="blocks">
+      <value name="picture">
+        <shadow type="text">
+          <field name="TEXT">barrier</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="ui">
+      <value name="picture">
+        <shadow type="text">
+          <field name="TEXT">icon_setting</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="player"></block>
+    <block type="selection"></block>
+    <block type="selectedPlayer"></block>
+    <block type="actionCase">
+      <value name="caseNumber">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="playerCase"></block>
+  </category>
+  <category name="モーダルフォーム" colour="165">
+    <block type="slider">
+      <value name="sldLabel">
+        <shadow type="text">
+          <field name="TEXT">スライダー</field>
+        </shadow>
+      </value>
+      <value name="min">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="max">
+        <shadow type="math_number">
+          <field name="NUM">100</field>
+        </shadow>
+      </value>
+      <value name="default">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="textField">
+      <value name="txfLabel">
+        <shadow type="text">
+          <field name="TEXT">テキストボックス</field>
+        </shadow>
+      </value>
+      <value name="placeholder">
+        <shadow type="text">
+          <field name="TEXT">後ろの文字</field>
+        </shadow>
+      </value>
+      <value name="default">
+        <shadow type="text">
+          <field name="TEXT">デフォルト君</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="dropdown">
+      <value name="drdLabel">
+        <shadow type="text">
+          <field name="TEXT">選択肢のラベル</field>
+        </shadow>
+      </value>
+      <value name="content">
+        <shadow type="text">
+          <field name="TEXT">apple, banana</field>
+        </shadow>
+      </value>
+      <value name="default">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="toggle">
+      <value name="tglLabel">
+        <shadow type="text">
+          <field name="TEXT">トグルのラベル</field>
+        </shadow>
+      </value>
+      <value name="cond">
+        <shadow type="text">
+          <field name="TEXT">On</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="dropdownCase">
+      <value name="elementNumber">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="selection">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="toggleCase">
+      <value name="elementNumber">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+  </category>
+  <category name="その他" colour="225">
+    <block type="join">
+      <value name="valueLeft">
+        <shadow type="text">
+          <field name="TEXT">りんご</field>
+        </shadow>
+      </value>
+      <value name="valueRight">
+        <shadow type="text">
+          <field name="TEXT">バナナ</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_number"></block>
+    <block type="text"></block>
+    <block type="targetScore">
+      <value name="scoreName">
+        <shadow type="text">
+          <field name="TEXT">xp</field>
+        </shadow>
+      </value>
+      <value name="player">
+        <shadow type="text">
+          <field name="TEXT">Steve</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="me"></block>
+    <block type="playerInfo">
+      <value name="player">
+        <shadow type="text">
+          <field name="TEXT">Alex</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="mathThree">
+      <value name="valueLeft">
+        <shadow type="text">
+          <field name="TEXT">1</field>
+        </shadow>
+      </value>
+      <value name="valueRight">
+        <shadow type="text">
+          <field name="TEXT">1</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="mathTwo">
+      <value name="value">
+        <shadow type="text">
+          <field name="TEXT">2</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="condPlayer"></block>
+    <block type="hastag">
+      <value name="name">
+        <shadow type="text">
+          <field name="TEXT">admin</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="cond">
+      <value name="valueLeft">
+        <shadow type="text">
+          <field name="TEXT">1</field>
+        </shadow>
+      </value>
+      <value name="valueRight">
+        <shadow type="text">
+          <field name="TEXT">1</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="includes">
+      <value name="value">
+        <shadow type="text">
+          <field name="TEXT">りんご</field>
+        </shadow>
+      </value>
+      <value name="part">
+        <shadow type="text">
+          <field name="TEXT">んご</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="notMe"></block>
+    <block type="stringToCond">
+      <value name="string">
+        <shadow type="text">
+          <field name="TEXT">[cond:1:=:1]</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="and"></block>
+    <block type="or"></block>
+    <block type="not"></block>
+  </category>
+</xml>
+
+
+<script src="blocks.js"></script>
+<script src="generators.js"></script>
+
+<script>
+const workspace = Blockly.inject('blocklyDiv', {
+  toolbox: document.getElementById('toolbox')
+});
+
+function updateLiveOutput() {
+  const code = mcGenerator.workspaceToCode(workspace);
+  document.getElementById('liveOutput').textContent = code;
+}
+
+workspace.addChangeListener(function(event) {
+  if (event.isUiEvent) return;
+  updateLiveOutput();
+});
+
+/* ===== コピー機能 ===== */
+document.getElementById("copyBtn").addEventListener("click", function() {
+  const text = document.getElementById("liveOutput").textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    this.textContent = "✅ コピー完了";
+    setTimeout(() => {
+      this.textContent = "📋 コピー";
+    }, 1500);
+  });
+});
+
+/* ===== ドラッグで幅変更 ===== */
+const resizer = document.getElementById("resizer");
+const left = document.getElementById("blocklyArea");
+const right = document.getElementById("codeArea");
+
+let isResizing = false;
+
+resizer.addEventListener("mousedown", () => {
+  isResizing = true;
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (!isResizing) return;
+
+  const totalWidth = window.innerWidth;
+  const newLeftWidth = (e.clientX / totalWidth) * 100;
+
+  if (newLeftWidth > 20 && newLeftWidth < 80) {
+    left.style.width = newLeftWidth + "%";
+    right.style.width = (100 - newLeftWidth) + "%";
+
+    Blockly.svgResize(workspace); // ← これに変更
+  }
+});
+
+
+document.addEventListener("mouseup", () => {
+  isResizing = false;
+});
+</script>
+
+</body>
+</html>
