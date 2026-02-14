@@ -969,4 +969,16 @@ mcGenerator.forBlock['not'] = function(block) {
         mcGenerator.valueToCode(block, 'cond', 0) || '""'
     const cond = unwrapAndEscape(rawCond);
     return [`"[not:${cond}]"`, 0];
+
+};
+
+mcGenerator.forBlock['stringToCond'] = function(block) {
+    if (!block.getParent()) {
+        return ["",0];
+    }
+    const rawString =
+        mcGenerator.valueToCode(block, 'string', 0) || '""'
+    const string = unwrapAndEscape(rawString);
+    return [`"${string}"`, 0];
+
 };
