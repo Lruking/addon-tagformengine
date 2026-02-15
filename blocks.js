@@ -770,3 +770,19 @@ const stringToCond = {
   }
 };
 Blockly.common.defineBlocks({stringToCond: stringToCond});
+
+const formValues = {
+  init: function() {
+    this.appendValueInput('elementNumber')
+    .setCheck(['Number', 'String'])
+      .appendField('要素番号：');
+    this.appendDummyInput('')
+      .appendField('の結果（値）');
+    this.setOutput(true, 'String');
+    this.setTooltip('フォームの要素の選択結果を返します。\n要素番号は、「スイッチ、スライダー、テキストボックス、ドロップダウン」に\nフォームの上から数えて[0,1,2...]と割り振られます。');
+    this.setHelpUrl('');
+    this.setColour(165);
+  }
+};
+Blockly.common.defineBlocks({formValues: formValues});
+                    
