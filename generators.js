@@ -996,3 +996,14 @@ mcGenerator.forBlock['cancel'] = function(block) {
     pushOutput(mcGenerator, "cancel", content);
     return ""; // ←直接出力しない
 };
+
+mcGenerator.forBlock['formValues'] = function(block) {
+    if (!block.getParent()) {
+        return ["",0];
+    }
+    const rawNumber =
+        mcGenerator.valueToCode(block, 'elementNumber', 0) || '""'
+    const elementNumber = unwrapAndEscape(rawNumber);
+    return [`"{formValues[${elementNumber}]}"`, 0];
+
+};
