@@ -20,7 +20,7 @@ function requireFormMode(block, requiredMode) {
     parent = parent.getParent();
   }
 
-  block.setWarningText("formCreateの中でのみ使用できます");
+  block.setWarningText("先にフォームを作成してください。");
 }
 
 const formCreate = {
@@ -34,7 +34,8 @@ const formCreate = {
     this.appendDummyInput('')
       .appendField('のフォームを作成する');
     this.setInputsInline(true)
-    this.setNextStatement(true, ['normal', 'action', 'mdal']);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, ['normal', 'action', 'modal']);
     this.setTooltip('フォームを作成します');
     this.setHelpUrl('');
     this.setColour(255);
@@ -42,18 +43,53 @@ const formCreate = {
 };
 Blockly.common.defineBlocks({formCreate: formCreate});
 
-const fake = {
+const whenTheTagIsAdded = {
   init: function() {
+    this.appendValueInput('tagName')
+      .appendField('名前：');
     this.appendDummyInput('')
-      .appendField('フェイク君');
+      .appendField('のタグが付与された時');
     this.setInputsInline(true)
-    this.setOutput(true, 'String');
-    this.setTooltip('');
+    this.setNextStatement(true, null);
+    this.setTooltip('設定したタグが付与されたときにフォームを表示します');
     this.setHelpUrl('');
-    this.setColour(225);
+    this.setColour(255);
   }
 };
-Blockly.common.defineBlocks({fake: fake});
+Blockly.common.defineBlocks({whenTheTagIsAdded: whenTheTagIsAdded});
+                    
+const whenTheItemIsUsed = {
+  init: function() {
+    this.appendValueInput('itemId')
+    .setCheck('String')
+      .appendField('ID：');
+    this.appendValueInput('itemName')
+    .setCheck('String')
+      .appendField('名前：');
+    this.appendDummyInput('')
+      .appendField('のアイテムが使用されたとき');
+    this.setInputsInline(true)
+    this.setNextStatement(true, null);
+    this.setTooltip('特定のアイテムを使用したときにフォームを表示します。');
+    this.setHelpUrl('');
+    this.setColour(255);
+  }
+};
+Blockly.common.defineBlocks({whenTheItemIsUsed: whenTheItemIsUsed});
+
+const whenSend = {
+  init: function() {
+    this.appendValueInput('message')
+      .appendField('メッセージ：');
+    this.appendDummyInput('')
+      .appendField('を送信した時');
+    this.setNextStatement(true, null);
+    this.setTooltip('プレイヤーが特定のメッセージを送信した時にフォームを表示します');
+    this.setHelpUrl('');
+    this.setColour(255);
+  }
+};
+Blockly.common.defineBlocks({whenSend: whenSend});
 
 const title = {
   init: function() {
@@ -785,4 +821,3 @@ const formValues = {
   }
 };
 Blockly.common.defineBlocks({formValues: formValues});
-                    
