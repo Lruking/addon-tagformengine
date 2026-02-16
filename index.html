@@ -97,6 +97,32 @@
 
 <xml id="toolbox" style="display: none">
   <category name="総合" colour="255">
+    <block type="whenTheTagIsAdded">
+      <value name="tagName">
+        <shadow type="text">
+          <field name="TEXT">show_form</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="whenTheItemIsUsed">
+      <value name="itemId">
+        <shadow type="text">
+          <field name="TEXT">book</field>
+        </shadow>
+      </value>
+      <value name="itemName">
+        <shadow type="text">
+          <field name="TEXT"></field>
+        </shadow>
+      </value>
+    </block>
+    <block type="whenSend">
+      <value name="message">
+        <shadow type="text">
+          <field name="TEXT">!form</field>
+        </shadow>
+      </value>
+    </block>
     <block type="formCreate"></block>
     <block type="title">
       <value name="content">
