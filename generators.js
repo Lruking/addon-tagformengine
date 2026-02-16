@@ -8,6 +8,8 @@ const mcGenerator = new Blockly.Generator('MC');
 mcGenerator.init = function(workspace) {
     this.outputQueue = [];
     this.globalCommands = [];   // ←追加
+    this.finalmode = "";        // ←追加
+    this.afterTagCase = null;   // ←念のため
 };
 
 function pushOutput(generator, type, value, isLast=false) {
@@ -115,6 +117,7 @@ function isFormMode(block, requiredMode) {
 ------------------------- */
 
 const BLOCK_PRIORITY = {
+    event: -1,
     formCreate: 0,
     title: 1,
     body: 2,
@@ -135,7 +138,7 @@ const BLOCK_PRIORITY = {
   };
 
   mcGenerator.finish = function(code) {
-
+    let finalmode = "";
     // LASTは同タイプ最後だけ残す
     const lastMap = {};
     const normal = [];
@@ -161,10 +164,9 @@ const BLOCK_PRIORITY = {
       const pb = BLOCK_PRIORITY[b.type] ?? 100;
       return pa - pb;
     });
-    code += `/tag @s add "formIn:`;
     // 出力
     for (const item of merged) {
-      code += buildCode(item);
+      code += buildCode(item, this);
     }
     if (this.globalCommands.length > 0) {
         code += ".cmd("
@@ -177,12 +179,15 @@ const BLOCK_PRIORITY = {
         code += ")";
     }
     code = code.trim();
+    if (this.finalmode === "tag") {
+        code += `.tag('remove', '${this.afterTagCase.tagName}')`
+    }
     code += '"';
     return code;
   };
   
   
-function buildCode(item) {
+function buildCode(item, generator) {
     switch(item.type) {
         case "formCreate": {
             return `${item.value}\n`;          
@@ -306,6 +311,30 @@ function buildCode(item) {
         case "cancel": {
             return `.ccl('${item.value}')\n`;
         }
+        case "event":{
+            const type = item.value.eventType;
+            switch(type) {
+                case "tag":{
+                    generator.finalmode = "tag";
+                    generator.afterTagCase = item.value;
+                    return `tag @a[tag="${item.value.tagName}"] add "formIn:`;
+                }
+                case "item":{
+                    let result = [];
+                    if (!!item.value.itemId) result.push(`tag="tfe:itemuse_id_${String(item.value.itemId)}"`);
+                    if (!!item.value.itemName) result.push(`tag="tfe:itemuse_name_${String(item.value.itemName)}"`);
+                    result = result.join(", ");
+                    generator.finalmode = "item";
+                    return `tag @a[${result}] add "formIn:`;
+                }
+                case "message":{
+                    generator.finalmode = "message";
+                    return `tag @a[tag="tfe:chat_${item.value.message}"] add "formIn:`;
+                }
+                default:
+                    return "";
+            }
+        }
         default:{
             return "";
         }
@@ -419,6 +448,51 @@ mcGenerator.forBlock['formCreate'] = function(block) {
   
     return "";
   };
+
+mcGenerator.forBlock['whenTheTagIsAdded'] = function(block) {
+
+    const raw =
+        mcGenerator.valueToCode(block, 'tagName', 0) || '""';
+    const tagName = unwrapAndEscape(raw);
+  
+    pushOutput(mcGenerator, "event", {
+        eventType: "tag",
+        tagName: tagName
+    }, true);
+
+    return "";
+};
+
+mcGenerator.forBlock['whenTheItemIsUsed'] = function(block) {
+
+    const rawId =
+        mcGenerator.valueToCode(block, 'itemId', 0) || '""';
+    const itemId = unwrapAndEscape(rawId);
+    const rawName =
+        mcGenerator.valueToCode(block, 'itemName', 0) || '""';
+    const itemName = unwrapAndEscape(rawName);
+    pushOutput(mcGenerator, "event", {
+        eventType: "item",
+        itemId: itemId,
+        itemName: itemName
+    }, true);
+
+    return "";
+};
+
+mcGenerator.forBlock['whenSend'] = function(block) {
+
+    const raw =
+        mcGenerator.valueToCode(block, 'message', 0) || '""';
+    const message = unwrapAndEscape(raw);
+  
+    pushOutput(mcGenerator, "event", {
+        eventType: "message",
+        message: message
+    }, true);
+
+    return "";
+};
 
 mcGenerator.forBlock['body'] = function(block) {
     if (!isUnderFormCreate(block)) return "";
