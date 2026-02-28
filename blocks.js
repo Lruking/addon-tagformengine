@@ -364,7 +364,7 @@ const slider = {
     .setCheck('Number')
       .appendField('最大値：');
     this.appendValueInput('default')
-    .setCheck('Number')
+    .setCheck(['Number', 'String'])
       .appendField('デフォルトの値：');
     this.appendValueInput('valueStep')
     .setCheck('Number')
@@ -393,7 +393,7 @@ const textField = {
     .setCheck('String')
       .appendField('プレースホルダー：');
     this.appendValueInput('default')
-    .setCheck('String')
+    .setCheck(['Number', 'String'])
       .appendField('デフォルトの文字：');
     this.setPreviousStatement(true, ['normal', 'modal']);
     this.setNextStatement(true, ['normal', 'modal']);
@@ -418,7 +418,7 @@ const dropdown = {
     .setCheck('String')
       .appendField('選択肢（" , "で区切る）：');
     this.appendValueInput('default')
-    .setCheck('Number')
+    .setCheck(['Number', 'String'])
       .appendField('デフォルトの選択番号：');
     this.setPreviousStatement(true, ['normal', 'modal']);
     this.setNextStatement(true, ['normal', 'modal']);
@@ -821,3 +821,4 @@ const formValues = {
   }
 };
 Blockly.common.defineBlocks({formValues: formValues});
+
